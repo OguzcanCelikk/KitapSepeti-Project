@@ -1,17 +1,25 @@
-import LoginPage from '../support/pages/Loginpage'
+import LoginPage from '../support/pages/Loginpage' //
 
-describe('Kitapsepeti US01: Kullanıcı Girişi Tüm Senaryolar', () => {
+describe('Kitapsepeti US01: Kullanıcı Girişi Tüm Senaryolar | User Login All Scenarios', () => {
     
+    /**
+     * TR: Her testten önce siteye gidilir ve engelleyici katmanlar (çerez vb.) gizlenir.
+     * EN: Before each test, visit the site and hide interstitial overlays (cookies, etc.).
+     */
     beforeEach(() => {
-    LoginPage.visit();
-    cy.get('body').then(($body) => {
-        if ($body.find('.ccp---nb-interstitial-overlay').length > 0) {
-            cy.get('.ccp---nb-interstitial-overlay').invoke('css', 'display', 'none');
-        }
+        LoginPage.visit(); //
+        cy.get('body').then(($body) => {
+            if ($body.find('.ccp---nb-interstitial-overlay').length > 0) {
+                cy.get('.ccp---nb-interstitial-overlay').invoke('css', 'display', 'none');
+            }
+        });
     });
-});
 
-    it('AC1 & AC2: UI Elemanlarının Kontrolü', () => {
+    /**
+     * TR: AC1 & AC2: Giriş panelindeki tüm UI elemanlarının varlığını doğrular.
+     * EN: AC1 & AC2: Verifies the existence of all UI elements in the login panel.
+     */
+    it('AC1 & AC2: UI Elemanlarının Kontrolü | UI Elements Validation', () => {
         LoginPage.elements.loginPanelTrigger().click({ force: true });
         LoginPage.elements.emailInput().should('exist');
         LoginPage.elements.passwordInput().should('exist');
@@ -20,49 +28,58 @@ describe('Kitapsepeti US01: Kullanıcı Girişi Tüm Senaryolar', () => {
         LoginPage.elements.registerBtn().should('exist');
     });
 
-    it('AC3 & AC4: Başarılı Giriş (Pozitif)', () => {
+    /**
+     * TR: AC3 & AC4: Geçerli bilgilerle başarılı giriş ve profil doğrulaması.
+     * EN: AC3 & AC4: Successful login with valid credentials and profile verification.
+     */
+    it('AC3 & AC4: Başarılı Giriş (Pozitif) | Successful Login (Positive)', () => {
         LoginPage.login('celik.oguzcan@hotmail.com', 'wSGYF8gMt2s.Ap');
+        // TR: Hesap başlığının görünür olmasını bekle | EN: Wait for account header visibility
         cy.get('#header-account', { timeout: 15000 }).should('be.visible');
         cy.visit("/uye-girisi-sayfasi");
         cy.url({ timeout: 10000 }).should('include', '/uye-girisi-sayfasi'); 
     });
 
-    it('AC5, AC6, AC7: Negatif Giriş Senaryoları', () => {
+    /**
+     * TR: AC5, AC6, AC7: Hatalı, geçersiz ve boş verilerle negatif giriş denemeleri.
+     * EN: AC5, AC6, AC7: Negative login attempts with incorrect, invalid, and empty data.
+     */
+    it('AC5, AC6, AC7: Negatif Giriş Senaryoları | Negative Login Scenarios', () => {
         const scenarios = [
-            { email: 'yanlis@mail.com', pass: '123', desc: 'AC5: Yanlış bilgiler' },
-            { email: 'hatali_format', pass: '123', desc: 'AC6: Geçersiz format' },
-            { email: ' ', pass: ' ', desc: 'AC7: Boş alanlar' }
+            { email: 'yanlis@mail.com', pass: '123', desc: 'AC5: Wrong Info' },
+            { email: 'hatali_format', pass: '123', desc: 'AC6: Invalid Format' },
+            { email: ' ', pass: ' ', desc: 'AC7: Empty Fields' }
         ];
 
         scenarios.forEach(sc => {
             LoginPage.login(sc.email, sc.pass);
             LoginPage.elements.errorMessage().should('exist')
-                .and('contain', 'Giriş bilgileriniz hatalı.'); //
+                .and('contain', 'Giriş bilgileriniz hatalı.'); 
             cy.reload();
         });
     });
 
-    it.skip ('AC8: Kısıtlama Testi (Brute Force)', () => {
-        // 12 hatalı deneme döngüsü / AC8: Canlı sistem güvenlik duvarı IP engellediği için bu test pas geçilmiştir.
+    /**
+     * TR: AC8: Güvenlik duvarı engeline takılmamak için bu test pas geçilmiştir.
+     * EN: AC8: This test is skipped to avoid production firewall IP blocking.
+     */
+    it.skip ('AC8: Kısıtlama Testi (Brute Force) | Rate Limiting Test', () => {
         Cypress._.times(12, () => {
             LoginPage.login('hacker@test.com', 'yanlis');
             cy.wait(1000)
-        
         });
-        cy.contains(/Çok fazla istek/i, { timeout: 20000 })
-      .should('exist');
-        LoginPage.elements.errorMessage({ timeout: 20000 }).should('exist')
-        .and('contain', 'istek');
+        cy.contains(/Çok fazla istek/i, { timeout: 20000 }).should('exist');
     });
 
-    it('AC9: Şifremi Unuttum Akışı', () => {
+    /**
+     * TR: AC9: Şifre hatırlatma sayfasının ve gerekli alanların kontrolü.
+     * EN: AC9: Validation of the password reminder page and required fields.
+     */
+    it('AC9: Şifremi Unuttum Akışı | Forgot Password Flow', () => {
         LoginPage.elements.loginPanelTrigger().click({ force: true });
         cy.contains('Şifremi Unuttum').click({ force: true });
-        cy.url().should('include', 'uye-sifre-hatirlat'); //
+        cy.url().should('include', 'uye-sifre-hatirlat'); 
         
-        
-        
-        // Ekstra kontrol: Sayfada email alanı ve şifremi hatırlat butonu olmalı
         LoginPage.elements.forgotEmailInput().should('exist');
         LoginPage.elements.sendResetBtn().should('exist');
     });

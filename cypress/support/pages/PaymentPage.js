@@ -1,35 +1,39 @@
 class PaymentPage {
+    /**
+     * TR: Ödeme ve kargo sayfasındaki tüm interaktif elementlerin tanımlandığı bölümdür.
+     * EN: Section where all interactive elements on the payment and cargo page are defined.
+     */
     elements = {
-        // Login Alanları
+        // TR: Giriş Alanları (Ödeme Öncesi) | EN: Login Fields (Pre-payment)
         loginEmail: () => cy.get('#login-form-131 [name="email"]'),
         loginPassword: () => cy.get('#login-form-131 [name="password"]'),
         loginSubmitBtn: () => cy.get('#ug-submit-btn'),
 
-        // Adres Sayfasından Ödeme Sayfasına Geçiş Butonu
+        // TR: Adres Sayfasından Ödeme Sayfasına Geçiş | EN: Transition from Address to Payment
         proceedToPaymentBtn: () => cy.get('.order-next-btn').first(),
 
-        // Kargo Seçenekleri
+        // TR: Kargo Seçenekleri | EN: Cargo Options
         pttCargoRadio: () => cy.get('#cargo-item-input-1'),
         hepsijetCargoRadio: () => cy.get('#cargo-item-input-2'),
 
-        // Ödeme Sekmeleri
+        // TR: Ödeme Sekmeleri | EN: Payment Tabs
         iyzicoTab: () => cy.get('#iyz-tab-payWithIyzico'),
         creditCardTab: () => cy.get('#iyz-tab-credit-card'),
 
-        // Kredi Kartı Formu
+        // TR: Kredi Kartı Formu | EN: Credit Card Form
         cardNameInput: () => cy.get('#ccname'),
         cardNumberInput: () => cy.get('#ccnumber'),
         cardExpiryInput: () => cy.get('#ccexp'),
         cardCvvInput: () => cy.get('#cccvc'),
 
-        // Final İşlemler
+        // TR: Final İşlemler ve Doğrulama | EN: Final Actions and Validation
         paymentSubmitBtn: () => cy.get('#iyz-payment-button'),
         cardNumberErrorMsg: () => cy.contains('Geçersiz bir kart numarası girdiniz'),
         
-        // Sipariş Özeti
+        // TR: Sipariş Özeti Kontrolleri | EN: Order Summary Controls
         orderSummaryBox: () => cy.get('#order-summary'), 
         grandTotalOnPayment: () => cy.get('#order-summary').contains('Genel Toplam').parent()
     };
 }
 
-export default new PaymentPage();
+export default new PaymentPage(); //
