@@ -10,7 +10,7 @@ class PaymentPage {
         loginSubmitBtn: () => cy.get('#ug-submit-btn'),
 
         // TR: Adres Sayfasından Ödeme Sayfasına Geçiş | EN: Transition from Address to Payment
-        proceedToPaymentBtn: () => cy.get('.order-next-btn').first(),
+        proceedToPaymentBtn: () => cy.contains('button', 'Ödeme Adımına Geç', { timeout: 10000 }),
 
         // TR: Kargo Seçenekleri | EN: Cargo Options
         pttCargoRadio: () => cy.get('#cargo-item-input-1'),
@@ -31,7 +31,8 @@ class PaymentPage {
         cardNumberErrorMsg: () => cy.contains('Geçersiz bir kart numarası girdiniz'),
         
         // TR: Sipariş Özeti Kontrolleri | EN: Order Summary Controls
-        orderSummaryBox: () => cy.get('#order-summary'), 
+        orderSummaryBox: () => cy.get('#order-summary'),
+        
         grandTotalOnPayment: () => cy.get('#order-summary').contains('Genel Toplam').parent()
     };
 }

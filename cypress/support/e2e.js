@@ -1,26 +1,6 @@
-// ***********************************************************
-// This example support/e2e.js is processed and
-// loaded automatically before your test files.
-//
-// This is a great place to put global configuration and
-// behavior that modifies Cypress.
-//
-// You can change the location of this file or turn off
-// automatically serving support files with the
-// 'supportFile' configuration option.
-//
-// You can read more here:
-// https://on.cypress.io/configuration
-// ***********************************************************
-
-// Import commands.js using ES2015 syntax:
 import "allure-cypress";
-import './commands'
+// Uygulama tarafındaki (site kaynaklı) hataların testi bozmasını engeller
 Cypress.on('uncaught:exception', (err, runnable) => {
-  return false;
-});
-Cypress.on('window:before:load', (win) => {
-  // Sitenin çerez uyarısını yerel depolamadan (localStorage) kapatmak için:
-  // win.localStorage.setItem('cookie-accepted', 'true'); 
-  
+    // google_trackConversion hatasını veya diğer uygulama hatalarını görmezden gel
+    return false;
 });

@@ -1,65 +1,99 @@
-import SearchPage from '../support/pages/SearchPage'; //
+import SearchPage from '../support/pages/SearchPage';
 import ProductPage from '../support/pages/ProductPage';
 import CartPage from '../support/pages/CartPage';
 
+/**
+ * TR: Uygulama kodundan (Google Ads vb.) kaynaklanan hataların testi durdurmasını engeller.
+ * EN: Prevents uncaught exceptions from application code (like Google Ads) from failing the tests.
+ */
+Cypress.on('uncaught:exception', (err, runnable) => {
+    return false;
+});
+
 describe('User Story 04: Sepet Yönetimi ve Kontrolü | Cart Management and Control', () => {
     
-    /**
-     * TR: Her testten önce sepete 'roman' kategorisinden bir ürün eklenir ve sepet sayfasına gidilir.
-     * EN: Before each test, a product from the 'roman' category is added to the cart, and the user navigates to the cart page.
-     */
     beforeEach(() => {
-        cy.visit('/'); //
+        /**
+         * TR: Yavaş yüklenen tracker scriptlerini engeller.
+         * EN: Blocks slow-loading tracker scripts.
+         */
+        cy.visit('/', { 
+            timeout: 120000, 
+            onBeforeLoad(win) {
+                Object.defineProperty(win, 'google_trackConversion', { value: () => {} });
+            }
+        });
+
+        /**
+         * TR: Butonların üzerini kapatan banner'ı kabul eder.
+         * EN: Accepts the banner that covers buttons.
+         */
+        cy.get('body').then(($body) => {
+            if ($body.find('.cc-nb-okagree').length > 0) {
+                cy.get('.cc-nb-okagree').click({ force: true });
+            }
+        });
+
+        /**
+         * TR: 'roman' araması yapar ve ilk ürünü sepete ekler.
+         * EN: Searches for 'roman' and adds the first product to cart.
+         */
         SearchPage.searchProduct('roman');
         SearchPage.elements.productTitles().first().click({ force: true });
         ProductPage.elements.addToCartBtn().click({ force: true });
-        cy.wait(2000); // TR: Animasyon bekleme | EN: Wait for animation
-        ProductPage.elements.goToCartBtn().click({ force: true }); // AC1
+
+        /**
+         * TR: Sepete Git: Açılan pop-up üzerinden sepet sayfasına yönlenir.
+         * EN: Navigates to the cart page via the success pop-up.
+         */
+        ProductPage.elements.goToCartBtn()
+            .should('exist', { timeout: 15000 }) 
+            .click({ force: true });
+        
+        cy.url().should('include', '/sepet');
     });
 
     /**
-     * TR: Ürün miktarının artırılması ve toplam fiyatın dinamik olarak güncellenmesini doğrular.
-     * EN: Validates increasing product quantity and ensures the total price updates dynamically.
+     * TR: AC2 - AC4: Miktar artırıldığında toplam fiyatın değiştiğini doğrular.
+     * EN: AC2 - AC4: Validates that the total price changes when quantity is increased.
      */
     it('AC2 - AC4: Miktar Artırma ve Fiyat Güncelleme | Quantity Increase & Price Update', () => {
-        // TR: Varsayılan miktarın 1 olduğunu doğrula | EN: Verify default quantity is 1
         CartPage.elements.quantityInput().should('have.value', '1');
         
-        // TR: Eski fiyatı al ve artış sonrası değiştiğini kontrol et 
-        // EN: Capture old price and verify it changes after increment
         CartPage.elements.grandTotal().invoke('text').then((oldPrice) => {
             CartPage.elements.quantityPlusBtn().first().click({ force: true });
-            cy.wait(3000); // TR: Hesaplama süresi | EN: Calculation time
             
-            CartPage.elements.grandTotal().invoke('text').should('not.eq', oldPrice); // AC4
+            // TR: Fiyat güncellemesi için kısa bir bekleme ve doğrulama.
+            // EN: Brief wait for price update and validation.
+            cy.wait(3000);
+            CartPage.elements.grandTotal().invoke('text').should('not.eq', oldPrice);
         });
     });
 
     /**
-     * TR: Sepetteki tüm ürünleri siler ve boş sepet uyarı mesajını kontrol eder.
-     * EN: Clears all items from the cart and verifies the empty cart warning message.
+     * TR: AC6 & AC7: Sepeti boşaltır ve boş sepet uyarılarını kontrol eder.
+     * EN: AC6 & AC7: Clears the cart and checks for empty cart warnings.
      */
     it('AC6 & AC7: Sepeti Temizleme ve Boş Sepet Kontrolü | Clear Cart & Empty State Validation', () => {
-        CartPage.elements.clearAllCartBtn().click({ force: true }); // AC6
+        CartPage.elements.clearAllCartBtn().click({ force: true });
 
-        // TR: Boş sepet mesajının görünürlüğünü doğrula | EN: Verify visibility of empty cart message
+        // TR: Boş sepet mesajını 15 saniye içinde bekle.
+        // EN: Wait for the empty cart message within 15 seconds.
         CartPage.elements.emptyCartMessage({ timeout: 15000 }).should('be.visible');
-        CartPage.elements.continueShoppingBtn().should('be.visible'); // AC7
+        CartPage.elements.continueShoppingBtn().should('be.visible');
     });
 
     /**
-     * TR: Satın alma sürecini başlatır ve misafir kullanıcı olarak adres sayfasına yönlenmeyi doğrular.
-     * EN: Initiates checkout and validates redirection to the address page as a guest user.
+     * TR: AC 8 & AC 10: Misafir olarak satın alma akışını başlatır.
+     * EN: AC 8 & AC 10: Initiates the checkout flow as a guest user.
      */
     it('AC 8 & AC 10: Satın Al ve Misafir Akışı | Checkout & Guest Flow', () => {
-        // TR: Satın Al butonuna tıkla (Çerez banner engelini aşmak için force kullanılır)
-        // EN: Click Checkout button (Using force to bypass cookie banner overlays)
         CartPage.elements.checkoutBtn().should('exist').click({ force: true });
 
-        // TR: Üye olmadan devam et seçeneğini kullan | EN: Select 'Continue as Guest'
-        CartPage.elements.continueAsGuestBtn().should('exist').click({ force: true });
+        CartPage.elements.continueAsGuestBtn()
+            .should('exist', { timeout: 10000 })
+            .click({ force: true });
 
-        // TR: Adres sayfası URL kontrolü | EN: Address page URL validation
         cy.url().should('include', '/order/address');
     });
 });
