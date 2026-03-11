@@ -90,8 +90,29 @@ EN: This is a comprehensive E2E test automation project for Kitapsepeti.com, bui
 | **AC4** | Ürün miktarı artırma ve anlık güncelleme. | Incrementing quantity and instant update. | ✅ |
 | **AC5-7** | Ürün silme ve boş sepet kontrolü. | Removing items and empty cart validation. | ✅ |
 </details>
+<details>
+  <summary>💳 User Story 05: Ödeme Akışı | Payment Flow</summary>
+  <br>
+
+| No | Acceptance Criteria (TR) | Acceptance Criteria (EN) | Status |
+| :--- | :--- | :--- | :---: |
+| **AC1-3** | Adres/Kargo adımları ve PTT Kargo seçimi. | Address/Cargo steps and PTT Cargo selection. | ✅ |
+| **AC5-7** | Kredi kartı form doğrulaması (Poz/Neg). | Credit card form validation (Pos/Neg). | ✅ |
+</details>
 
 <details>
+  <summary>👤 User Story 06: Misafir Girişi | Guest Checkout</summary>
+  <br>
+
+| No | Acceptance Criteria (TR) | Acceptance Criteria (EN) | Status |
+| :--- | :--- | :--- | :---: |
+| **AC1-2** | "Üye Olmadan Devam Et" butonu kontrolü. | "Continue as Guest" button check. | ✅ |
+| **AC3-5** | Misafir form alanları ve hata uyarıları. | Guest form fields and error alerts. | ✅ |
+| **AC6** | Başarılı form gönderimi ve ödemeye geçiş. | Successful submission and payment transition. | ✅ |
+</details>
+
+<details>
+  
   <summary
 
 ---
